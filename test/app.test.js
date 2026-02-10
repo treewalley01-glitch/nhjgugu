@@ -16,78 +16,83 @@ test.after(() => {
   server.close();
 });
 
-test('full otp login + order + payment flow works', async () => {
-  const productsRes = await fetch(`${base}/api/products`);
+test('catalog filters + account + wishlist + prepaid payment flow + admin stats', async () => {
+  const metaRes = await fetch(`${base}/api/catalog/meta`);
+  assert.equal(metaRes.status, 200);
+
+  const productsRes = await fetch(`${base}/api/products?category=Beds&material=Sheesham&sort=price_asc`);
   assert.equal(productsRes.status, 200);
   const productsData = await productsRes.json();
-  assert.ok(productsData.products.length > 0);
+  assert.ok(productsData.products.length >= 1);
 
-  const sendOtpRes = await fetch(`${base}/api/auth/send-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: '+919999999999' })
+  const signupRes = await fetch(`${base}/api/auth/signup`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'Tester', phone: '+919900001111', email: 'tester@tree.test', password: 'pass1234'
+    })
   });
-  assert.equal(sendOtpRes.status, 200);
-  const sendOtpData = await sendOtpRes.json();
+  assert.equal(signupRes.status, 201);
 
-  const verifyOtpRes = await fetch(`${base}/api/auth/verify-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sessionId: sendOtpData.sessionId, otp: sendOtpData.demoOtp })
+  const loginRes = await fetch(`${base}/api/auth/login`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ emailOrPhone: 'tester@tree.test', password: 'pass1234' })
   });
-  assert.equal(verifyOtpRes.status, 200);
-  const verifyOtpData = await verifyOtpRes.json();
-  assert.ok(verifyOtpData.token);
+  assert.equal(loginRes.status, 200);
+  const loginData = await loginRes.json();
+  const auth = { 'Content-Type': 'application/json', Authorization: `Bearer ${loginData.token}` };
+
+  const addrRes = await fetch(`${base}/api/account/addresses`, {
+    method: 'POST', headers: auth,
+    body: JSON.stringify({
+      name: 'Tester', line1: 'Street 1', city: 'Jaipur', state: 'RJ', pincode: '302001', phone: '+919900001111'
+    })
+  });
+  assert.equal(addrRes.status, 201);
+  const addrData = await addrRes.json();
+
+  const wishAddRes = await fetch(`${base}/api/account/wishlist/${productsData.products[0].id}`, {
+    method: 'POST', headers: auth
+  });
+  assert.equal(wishAddRes.status, 200);
+
+  const couponRes = await fetch(`${base}/api/coupons/validate`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'TREE10', total: productsData.products[0].price })
+  });
+  assert.equal(couponRes.status, 200);
 
   const orderRes = await fetch(`${base}/api/orders`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${verifyOtpData.token}`
-    },
+    method: 'POST', headers: auth,
     body: JSON.stringify({
       items: [{ productId: productsData.products[0].id, quantity: 1 }],
-      shippingAddress: {
-        name: 'Test Buyer',
-        address: 'Test Street',
-        city: 'Mumbai',
-        pincode: '400001'
-      }
+      addressId: addrData.address.id,
+      couponCode: 'TREE10',
+      paymentMode: 'UPI'
     })
   });
   assert.equal(orderRes.status, 201);
   const orderData = await orderRes.json();
 
-  const paymentInitRes = await fetch(`${base}/api/payment/initiate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${verifyOtpData.token}`
-    },
-    body: JSON.stringify({
-      orderId: orderData.order.id,
-      cardNumber: '4111111111111111',
-      cardHolder: 'Test Buyer',
-      expiry: '12/28',
-      cvv: '123'
-    })
+  const payInitRes = await fetch(`${base}/api/payment/initiate`, {
+    method: 'POST', headers: auth,
+    body: JSON.stringify({ orderId: orderData.order.id, gateway: 'Razorpay', mode: 'UPI', upiId: 'tree@upi' })
   });
-  assert.equal(paymentInitRes.status, 200);
-  const paymentInitData = await paymentInitRes.json();
+  assert.equal(payInitRes.status, 200);
+  const payInitData = await payInitRes.json();
 
-  const paymentVerifyRes = await fetch(`${base}/api/payment/verify-otp`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${verifyOtpData.token}`
-    },
-    body: JSON.stringify({
-      paymentSessionId: paymentInitData.paymentSessionId,
-      otp: paymentInitData.demoOtp
-    })
+  const payVerifyRes = await fetch(`${base}/api/payment/verify-otp`, {
+    method: 'POST', headers: auth,
+    body: JSON.stringify({ paymentSessionId: payInitData.paymentSessionId, otp: payInitData.demoOtp })
   });
+  assert.equal(payVerifyRes.status, 200);
+  const payVerifyData = await payVerifyRes.json();
+  assert.equal(payVerifyData.order.status, 'PAID');
 
-  assert.equal(paymentVerifyRes.status, 200);
-  const paymentVerifyData = await paymentVerifyRes.json();
-  assert.equal(paymentVerifyData.order.status, 'PAID');
+  const trackRes = await fetch(`${base}/api/tracking/${payVerifyData.order.trackingId}`, { headers: auth });
+  assert.equal(trackRes.status, 200);
+
+  const adminRes = await fetch(`${base}/api/admin/dashboard`, { headers: { 'x-admin-key': 'treewalley-admin-key' } });
+  assert.equal(adminRes.status, 200);
+  const adminData = await adminRes.json();
+  assert.ok(adminData.ordersCount >= 1);
 });
