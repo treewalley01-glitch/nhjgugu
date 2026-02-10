@@ -65,11 +65,39 @@ npm start
 
 Open `http://localhost:3000`
 
+## Health check
+
+```bash
+curl http://localhost:3000/health
+```
+
 ## Test
 
 ```bash
 npm test
 ```
+
+## Publish / Deploy
+
+### 1) Render (quick publish)
+- `render.yaml` is included.
+- Create a new Render Web Service from this repo.
+- Render will run:
+  - Build: `npm ci`
+  - Start: `npm start`
+- Set environment variable `ADMIN_KEY` in Render dashboard.
+
+### 2) Docker publish
+
+```bash
+npm run publish:docker
+npm run publish:run
+```
+
+### 3) Auto publish Docker image from GitHub Actions
+- Workflow file: `.github/workflows/publish.yml`
+- On push/tag/manual run, it builds and pushes image to:
+  - `ghcr.io/<owner>/<repo>`
 
 ## Notes
 

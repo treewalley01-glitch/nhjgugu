@@ -150,6 +150,11 @@ function userSafe(user) {
   };
 }
 
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', service: 'treewalley-furniture', ts: new Date().toISOString() });
+});
+
 app.get('/api/catalog/meta', (_req, res) => {
   const categories = [...new Set(products.map((p) => p.category))];
   const materials = [...new Set(products.map((p) => p.material))];

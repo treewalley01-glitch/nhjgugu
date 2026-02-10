@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "publish:docker": "docker build -t treewalley-furniture:latest .",
+    "publish:run": "docker run --rm -p 3000:3000 treewalley-furniture:latest"
   },
   "dependencies": {
     "express": "^4.19.2"
