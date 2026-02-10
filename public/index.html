@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeWalley Furniture Marketplace</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>🪑 TreeWalley Furniture</h1>
+      <p>Amazon-like buying experience for TreeWalley only.</p>
+      <div class="row wrap">
+        <input id="searchInput" placeholder="Search beds, sofa, cabinet..." />
+        <button id="searchBtn">Search</button>
+        <button id="loginBtn">Login / Signup</button>
+        <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+        <button id="wishlistBtn">Wishlist</button>
+        <button id="ordersBtn">Order History</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Catalog Filters</h2>
+        <div class="grid4">
+          <select id="categoryFilter"><option value="">All Categories</option></select>
+          <select id="materialFilter"><option value="">All Materials</option></select>
+          <select id="sizeFilter"><option value="">All Sizes</option></select>
+          <select id="sortFilter">
+            <option value="relevance">Sort: Relevance</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating_desc">Top Rated</option>
+          </select>
+          <input id="minPrice" placeholder="Min Price" type="number" />
+          <input id="maxPrice" placeholder="Max Price" type="number" />
+          <button id="applyFilters">Apply Filters</button>
+          <button id="clearFilters">Clear</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Products</h2>
+        <div id="products" class="grid"></div>
+      </section>
+
+      <section id="cartSection" class="panel hidden">
+        <h2>Cart & Checkout</h2>
+        <pre id="cartItems"></pre>
+
+        <div class="grid2">
+          <input id="couponInput" placeholder="Coupon e.g. TREE10" />
+          <button id="applyCouponBtn">Apply Coupon</button>
+        </div>
+
+        <h3>Address</h3>
+        <form id="addressForm" class="grid2">
+          <input name="name" placeholder="Name" required />
+          <input name="phone" placeholder="Phone" required />
+          <input name="line1" placeholder="Address line" required />
+          <input name="city" placeholder="City" required />
+          <input name="state" placeholder="State" required />
+          <input name="pincode" placeholder="Pincode" required />
+          <button type="submit">Save Address</button>
+        </form>
+
+        <h3>Payment Mode</h3>
+        <select id="orderPaymentMode">
+          <option>UPI</option>
+          <option>Card</option>
+          <option>NetBanking</option>
+          <option>COD</option>
+        </select>
+
+        <button id="placeOrderBtn">Place Order</button>
+      </section>
+
+      <section id="paymentSection" class="panel hidden">
+        <h2>Payment Gateway</h2>
+        <form id="paymentForm" class="grid2">
+          <select name="gateway">
+            <option>Razorpay</option>
+            <option>PayU</option>
+            <option>Cashfree</option>
+          </select>
+          <select name="mode">
+            <option>UPI</option>
+            <option>Card</option>
+            <option>NetBanking</option>
+          </select>
+          <input name="upiId" placeholder="UPI ID" />
+          <input name="cardNumber" placeholder="Card Number" />
+          <input name="bankName" placeholder="Bank Name" />
+          <button type="submit">Initiate Payment</button>
+        </form>
+
+        <form id="paymentOtpForm" class="grid2 hidden">
+          <input name="otp" placeholder="Enter OTP" required />
+          <button type="submit">Verify Payment OTP</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Trust Features</h2>
+        <div class="grid2">
+          <form id="reviewForm">
+            <h3>Add Review</h3>
+            <input name="productId" placeholder="Product ID" required />
+            <input name="rating" type="number" min="1" max="5" placeholder="Rating 1-5" required />
+            <input name="comment" placeholder="Comment" />
+            <button type="submit">Submit Review</button>
+          </form>
+          <div>
+            <h3>FAQ & Policies</h3>
+            <button id="loadFaqBtn">Load FAQ</button>
+            <button id="loadPoliciesBtn">Load Policies</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Admin Dashboard</h2>
+        <p>Use admin key: <code>treewalley-admin-key</code></p>
+        <button id="adminStatsBtn">Load Sales Report</button>
+      </section>
+
+      <section class="panel">
+        <h2>Status Console</h2>
+        <pre id="status"></pre>
+      </section>
+    </main>
+
+    <dialog id="authDialog">
+      <h3>Signup / Login / OTP</h3>
+      <form id="signupForm">
+        <input name="name" placeholder="Name" required />
+        <input name="phone" placeholder="Phone" required />
+        <input name="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Signup</button>
+      </form>
+
+      <form id="loginForm">
+        <input name="emailOrPhone" placeholder="Email or phone" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      <form id="sendOtpForm">
+        <input name="phone" placeholder="Phone for OTP" required />
+        <button type="submit">Send OTP</button>
+      </form>
+
+      <form id="verifyOtpForm" class="hidden">
+        <input name="otp" placeholder="OTP" required />
+        <button type="submit">Verify OTP</button>
+      </form>
+
+      <button id="closeAuth">Close</button>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
