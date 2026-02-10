@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeWalley Furniture</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>TreeWalley Furniture</h1>
+      <p>Amazon-like buying flow, only TreeWalley products.</p>
+      <div class="actions">
+        <button id="loginBtn">Login (OTP)</button>
+        <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <h2>Featured Furniture</h2>
+        <div id="products" class="grid"></div>
+      </section>
+
+      <section id="checkoutSection" class="panel hidden">
+        <h2>Checkout</h2>
+        <div id="checkoutItems"></div>
+
+        <h3>Shipping Address</h3>
+        <form id="shippingForm">
+          <input name="name" placeholder="Full Name" required />
+          <input name="address" placeholder="Address" required />
+          <input name="city" placeholder="City" required />
+          <input name="pincode" placeholder="Pincode" required />
+          <button type="submit">Place Order</button>
+        </form>
+      </section>
+
+      <section id="paymentSection" class="panel hidden">
+        <h2>Payment Gateway</h2>
+        <p>Secure card payment + OTP verification.</p>
+        <form id="paymentForm">
+          <input name="cardNumber" placeholder="Card Number" required />
+          <input name="cardHolder" placeholder="Card Holder" required />
+          <input name="expiry" placeholder="MM/YY" required />
+          <input name="cvv" placeholder="CVV" required />
+          <button type="submit">Pay & Send OTP</button>
+        </form>
+
+        <form id="paymentOtpForm" class="hidden">
+          <input name="otp" placeholder="Enter payment OTP" required />
+          <button type="submit">Verify OTP & Complete Payment</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Status</h2>
+        <pre id="status">Welcome to TreeWalley Furniture.</pre>
+      </section>
+    </main>
+
+    <dialog id="loginDialog">
+      <h3>Login with OTP</h3>
+      <form id="otpSendForm">
+        <input name="phone" placeholder="Phone e.g. +919999999999" required />
+        <button type="submit">Send OTP</button>
+      </form>
+      <form id="otpVerifyForm" class="hidden">
+        <input name="otp" placeholder="Enter OTP" required />
+        <button type="submit">Verify OTP</button>
+      </form>
+      <button id="closeLogin">Close</button>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
